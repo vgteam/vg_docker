@@ -26,7 +26,9 @@ RUN apt-get update && apt-get install -y software-properties-common \
     cmake \
     libsnappy-dev \
     libgflags-dev \
-    zlib1g-dev
+    zlib1g-dev \
+    bison \
+    flex
 
     #python-dev \
     #protobuf-compiler \
