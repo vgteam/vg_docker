@@ -1,58 +1,45 @@
-
-## Use a base ubuntu install
-FROM ubuntu:14.04
 MAINTAINER vgteam
+ARG vg_git_revision=master
+FROM ubuntu:16.04
 
-## Download dependencies for vg, pretty standard fare
-#RUN sed 's/main$/main universe/' -i /etc/apt/sources.list
-RUN apt-get update && apt-get install -y software-properties-common \
-    gcc-4.9-base \
-    g++ \
-    ncurses-dev \
+# Make sure the en_US.UTF-8 locale exists, since we need it for tests
+RUN locale-gen en_US en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+
+# install apt dependencies
+RUN apt-get -qq update && apt-get -qq install -y \
     pkg-config \
-    build-essential \
-    libjansson-dev \
-    automake \
-    libevent-2.0-5 \
-    libevent-pthreads-2.0-5 \
-    libpomp-dev \
-    libtool \
+    sudo \
     curl \
-    unzip \
     wget \
-    libbz2-dev \
-    gzip \
-    git \
+    unzip \
+    build-essential \
+    make \
+    automake \
     cmake \
-    libsnappy-dev \
-    libgflags-dev \
-    zlib1g-dev \
+    libtool \
     bison \
-    flex
+    flex \
+    git \
+    zlib1g-dev \
+    libbz2-dev \
+    libncurses5-dev \
+    libgoogle-perftools-dev \
+    libjansson-dev \
+    librdf-dev \
+    jq \
+    bc \
+    rs \
+    redland-utils \
+    raptor2-utils \
+    rasqal-utils
 
-    #python-dev \
-    #protobuf-compiler \
-    #libprotoc-dev \
-    
-    #RUN apt-get update
+# fetch the desired git revision of vg
+RUN git clone --recursive --depth 1 -b ${vg_git_revision} /vg
+WORKDIR /vg
 
-## Set CXXFLAGS and CFLAGS for gcc to use SSE4.1
-#ENV CXXFLAGS "-O2 -g march=corei7 -mavx -fopenmp -std=c++11"
-#ENV CXXFLAGS "$CXXFLAGS -march=corei7 -mavx"
+# Build
+RUN . ./source_me.sh && make -j$(nproc) && make static
 
-## Download VG and its git dependencies
-RUN git clone --recursive https://github.com/edawson/vg.git /home/vg
-RUN cd /home/vg && . ./source_me.sh && make
-#RUN cd /home/vg; make
-#RUN cp -r /home/vg/include/* /usr/local/include/
-ENV LIBRARY_PATH /home/vg/lib:$LIBRARY_PATH
-ENV LD_LIBRARY_PATH /home/vg/lib:$LD_LIBRARY_PATH
-ENV LD_INCLUDE_PATH /home/vg/include:$LD_INCLUDE_PATH
-ENV C_INCLUDE_PATH /home/vg/include:$C_INCLUDE_PATH
-ENV CPLUS_INCLUDE_PATH /home/vg/include:$CPLUS_INCLUDE_PATH
-ENV INCLUDE_PATH /home/vg/include:$INCLUDE_PATH
-ENV PATH /home/vg/bin:$PATH
-#RUN cp -r /home/vg/lib/* /usr/local/lib
-#RUN ln -s "/home/vg/bin/vg" "/usr/bin/vg"
-#CMD cd /home/vg/ && . ./source_me.sh && vg
-#ENTRYPOINT vg
+# Set up entrypoint
+ENV PATH /vg/bin:$PATH
+ENTRYPOINT ["/vg/bin/vg"]

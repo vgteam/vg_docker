@@ -1,0 +1,9 @@
+language: cpp
+sudo: required
+dist: trusty
+install: true
+script:
+- git submodule update --init
+- |
+  vg_git_revision=$(git describe -C vg --long --always --tags)
+  sudo docker build --build-arg "vg_git_revision=${vg_git_revision}" .
