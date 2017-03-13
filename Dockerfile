@@ -34,7 +34,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     rasqal-utils
 
 # fetch the desired git revision of vg
-RUN git clone --recursive --depth 1 -b ${vg_git_revision} /vg
+RUN mkdir /vg && git clone --recursive --depth 1 -b ${vg_git_revision} /vg
 WORKDIR /vg
 
 # Build
