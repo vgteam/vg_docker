@@ -6,5 +6,10 @@ script:
 - |
   # detect the desired git revision of vg from the submodule in this repo
   vg_git_revision=$(git -C vg describe --long --always --tags)
+  echo "vg_git_revision=${vg_git_revision}"
   # build a docker image from it
   sudo docker build --build-arg "vg_git_revision=${vg_git_revision}" -t "vgteam/vg:${vg_git_revision}" .
+  # sanity check
+  sudo docker run "vgteam/vg:${vg_git_revision}" version
+  # full test suite
+  sudo docker run --entrypoint /bin/bash "vgteam/vg:${vg_git_revision}" make test

@@ -1,6 +1,6 @@
+FROM ubuntu:16.04
 MAINTAINER vgteam
 ARG vg_git_revision=master
-FROM ubuntu:16.04
 
 # Make sure the en_US.UTF-8 locale exists, since we need it for tests
 RUN locale-gen en_US en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
