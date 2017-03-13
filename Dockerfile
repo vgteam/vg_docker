@@ -12,6 +12,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     curl \
     wget \
     unzip \
+    bsdmainutils \
     build-essential \
     make \
     automake \
@@ -31,7 +32,8 @@ RUN apt-get -qq update && apt-get -qq install -y \
     rs \
     redland-utils \
     raptor2-utils \
-    rasqal-utils
+    rasqal-utils \
+    samtools
 
 # fetch the desired git revision of vg
 RUN git clone https://github.com/vgteam/vg.git /vg
