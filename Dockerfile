@@ -34,8 +34,9 @@ RUN apt-get -qq update && apt-get -qq install -y \
     rasqal-utils
 
 # fetch the desired git revision of vg
-RUN git clone --recursive -b ${vg_git_revision} https://github.com/vgteam/vg.git /vg
+RUN git clone https://github.com/vgteam/vg.git /vg
 WORKDIR /vg
+RUN git checkout "$vg_git_revision" && git submodule update --init --recursive
 
 # Build
 RUN . ./source_me.sh && make -j$(nproc) && make static
