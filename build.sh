@@ -8,8 +8,8 @@ vg_git_tag="vgteam/vg:$(git -C vg describe --long --always --tags)"
 # build a docker image from it
 sudo docker build --build-arg "vg_git_revision=${vg_git_revision}" -t "$vg_git_tag" .
 # sanity check
-sudo docker run "$vg_git_tag" version
+sudo docker run -t "$vg_git_tag" version
 # full test suite
-sudo docker run --entrypoint /bin/bash "$vg_git_tag" make test
+sudo docker run -t --entrypoint=/bin/bash "$vg_git_tag" -c make test
 
 # TODO: also generate a slim image with just the static vg executable
