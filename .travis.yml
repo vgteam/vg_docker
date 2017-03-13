@@ -5,5 +5,7 @@ install: true
 script:
 - git submodule update --init
 - |
+  # detect the desired git revision of vg from the submodule in this repo
   vg_git_revision=$(git describe -C vg --long --always --tags)
-  sudo docker build --build-arg "vg_git_revision=${vg_git_revision}" .
+  # build a docker image from it
+  sudo docker build --build-arg "vg_git_revision=${vg_git_revision}" -t "vgteam/vg:${vg_git_revision}" .
