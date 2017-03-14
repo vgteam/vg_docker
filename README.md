@@ -6,7 +6,7 @@ This repository orchestrates [Travis CI](https://travis-ci.org/vgteam/vg_docker)
 
 Above, a specific revision of vg is recorded as a git submodule. Updating this repository - particularly the vg submodule revision - causes the generation of a pair of Docker images in Quay:
 
-[![quay.io/vgteam/vg](https://pbs.twimg.com/media/C62UiihUwAE99R3.jpg:large)](https://quay.io/repository/vgteam/vg?tab=tags)](https://quay.io/repository/vgteam/vg?tab=tags)
+[![quay.io/vgteam/vg](https://pbs.twimg.com/media/C62UiihUwAE99R3.jpg:large)](https://quay.io/repository/vgteam/vg?tab=tags)
 
 In this example pair, each image is built from vg git revision [`37f68b6e`](https://github.com/vgteam/vg/commit/37f68b6e0852e9931d54b3082060dd32748b78da). (`v1.4.0` is the newest git tag on the lineage leading to that revision, and this lineage has 2,425 commits following that tag.)
 * The `-run` image contains the static vg executable and some additional scripts and tools, suitable for low-overhead runtime deployment.
@@ -40,11 +40,14 @@ The vg source tree, and all its submodules, are built from scratch on each updat
 Clone this repository locally, then update the vg submodule revision and push back to GitHub:
 
 ```
-vg_docker$ git -C vg fetch origin
-vg_docker$ git -C vg checkout DESIRED_VG_REVISION
-vg_docker$ git add vg
-vg_docker$ git commit -m 'vg DESIRED_VG_REVISION'
-vg_docker$ git push origin
+git clone https://github.com/vgteam/vg_docker.git
+cd vg_docker
+git submodule update --init
+git -C vg fetch origin
+git -C vg checkout DESIRED_VG_REVISION
+git add vg
+git commit -m 'vg DESIRED_VG_REVISION'
+git push origin
 ```
 
 If you'll be iterating rapidly, then as a courtesy you could do this on your own branch of vg_docker instead of master.
@@ -55,9 +58,9 @@ Once you push the update, monitor the image build progress on [Travis CI](https:
 
 When an update to this repository is pushed,
 
-1. Travis CI finds the update and, according to `.travis.yml` above, runs `build.sh` which:
+1. Travis CI notices and, according to `.travis.yml` above, runs `build.sh` which:
 1. uses `docker build` to bake and test the images (on the Travis CI worker)
 1. logs in to Quay using an authentication token for the `vgteam+travis` robot account, stored using a Travis secure environment variable.
 1. pushes the images to Quay.
 
-Compared to the convenient automatic build features of Quay and Docker Hub, this methodology provides us more control over how the images are prepared, tested, and tagged.
+Compared to the simpler automatic build features of Quay and Docker Hub, this provides us more control over how the images are prepared, tested, and tagged.
