@@ -22,15 +22,15 @@ mkdir -p ctx/vg/
 temp_container_id=$(sudo docker create "${image-tag-prefix}-build")
 sudo docker cp "${temp_container_id}:/vg/bin/" ctx/vg/bin/
 sudo docker cp "${temp_container_id}:/vg/scripts/" ctx/vg/scripts/
-# - synthesize a Dockerfile to add that stuff along with minimal apt dependencies for runtime
+# - synthesize a Dockerfile for a new image with that stuff along with the minimal apt dependencies
 echo "FROM ubuntu:16.04
 MAINTAINER vgteam
 RUN apt-get -qq update && apt-get -qq install -y curl wget jq samtools
 RUN apt-get clean
 COPY vg/ /vg/
 " > ctx/Dockerfile
-tree ctx
-# - build image from our synthesized context
+ls -lR ctx
+# - build image from this synthesized context
 sudo docker build --no-cache -t "${image-tag-prefix}-run-preprecursor" ctx/
 # - flatten the image, to further reduce its deploy size, and set up the runtime ENV/WORKDIR etc.
 temp_container_id=$(sudo docker create "${image-tag-prefix}-run-preprecursor")
