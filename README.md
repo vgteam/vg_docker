@@ -56,7 +56,7 @@ Once you push the update, monitor the image build progress on [Travis CI](https:
 
 ## under the hood
 
-When an update to this repository is pushed,
+When you push an update to this repository,
 
 1. Travis CI notices and, according to `.travis.yml` above, runs `build.sh` which:
 1. uses `docker build` to bake and test the images (on the Travis CI worker)
