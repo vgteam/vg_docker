@@ -1,3 +1,4 @@
+# Dockerfile for a full vg build from source
 FROM ubuntu:16.04
 MAINTAINER vgteam
 ARG vg_git_revision=master
@@ -6,7 +7,7 @@ ARG vg_git_revision=master
 RUN locale-gen en_US en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
 
 # install apt dependencies
-RUN apt-get -qq update && apt-get -qq install -y \
+RUN apt-get -qq install -y \
     pkg-config \
     sudo \
     curl \
@@ -43,6 +44,4 @@ RUN git checkout "$vg_git_revision" && git submodule update --init --recursive
 # Build
 RUN . ./source_me.sh && make -j$(nproc) && make static
 
-# Set up entrypoint
 ENV PATH /vg/bin:$PATH
-ENTRYPOINT ["/vg/bin/vg"]

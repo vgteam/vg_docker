@@ -1,0 +1,20 @@
+# Dockerfile for vg binaries, scripts, and minimal runtime dependencies.
+# It's assumed the desired vg binaries and scripts have been built externally and placed
+# in the vg/ folder of the Docker build context (all orchestrated in ../build.sh)
+FROM ubuntu:16.04
+MAINTAINER vgteam
+
+# install minimal apt dependencies
+RUN apt-get -qq install -y \
+    sudo \
+    curl \
+    wget \
+    jq \
+    samtools
+
+# Copy in the binaries, scripts, etc.
+COPY vg/ /vg/
+
+# Set up environment
+ENV PATH /vg/bin:$PATH
+WORKDIR /vg
