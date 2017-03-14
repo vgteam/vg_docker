@@ -17,12 +17,12 @@ sudo docker run -t "${image-tag-prefix}-build" vg version # sanity check
 # sudo docker run -t "${image-tag-prefix}-build" make test
 
 # now make a separate docker image with just the binaries, scripts, and minimal runtime dependencies:
-# - copy binaries & scripts out of the build image
+# - copy binaries & scripts out of the previous image into a directory we'll use as a build context for the new image
 mkdir -p ctx/vg/
 temp_container_id=$(sudo docker create "${image-tag-prefix}-build")
 sudo docker cp "${temp_container_id}:/vg/bin/" ctx/vg/bin/
 sudo docker cp "${temp_container_id}:/vg/scripts/" ctx/vg/scripts/
-# - synthesize a docker build context to create a new image with that stuff and the apt packages for runtime
+# - synthesize a Dockerfile to add that stuff along with minimal apt dependencies for runtime
 echo "FROM ubuntu:16.04
 MAINTAINER vgteam
 RUN apt-get -qq update && apt-get -qq install -y curl wget jq samtools
@@ -30,11 +30,11 @@ RUN apt-get clean
 COPY vg/ /vg/
 " > ctx/Dockerfile
 tree ctx
-# - build from this context
+# - build image from our synthesized context
 sudo docker build --no-cache -t "${image-tag-prefix}-run-preprecursor" ctx/
 # - flatten the image, to further reduce its deploy size, and set up the runtime ENV/WORKDIR etc.
 temp_container_id=$(sudo docker create "${image-tag-prefix}-run-preprecursor")
-sudo docker export "$temp_container_id" | docker import - "${image-tag-prefix}-run-precursor"
+sudo docker export "$temp_container_id" | sudo docker import - "${image-tag-prefix}-run-precursor"
 echo "FROM ${image-tag-prefix}-run-precursor" '
 ENV PATH /vg/bin:$PATH
 WORKDIR /vg' | sudo docker build -t "${image-tag-prefix}-run" -
