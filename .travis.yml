@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 install: true
 script:
-- bash build.sh
+- sudo -E bash build.sh
 env:
   matrix:
     secure: YrVCXxjVuektcdthn430IiM0mNgoS5Xxgm38K9Kb6ekdL9/gwzNH5s3VhIZyujGtAiCpgI/R/0tyi9MDOyvixafg0NG6OtiLp2vQ9hh9/4jgIWbwYaqpXj8d/3OGAUCXa4Xpbo3k9tkMtvi52QkJL3e2sztaEXK5/cfNGtQ59VjMkXW2Jo1Saj+rgNnkyoOkrucOKphjJw274qFdPQH9CahqO5R+ppZxRkHJZPf+JQTKmFC9miFhgqDlxKUJfKf+xLXh8HMDczYiTvEwFLdfnYvxPki/8pbZHdbeiIxNERGGEaER12baWL5QqjkXtc1H652zuM/tGONIGbuUFw1yulE254uNaiz/Z+NcxSJD3U+1lfVaEysqjEW23vrL0sDA/2e1xSq5AgmjzFpe22+p7/AQlgbssryvGWT/KgcIxXoiLidYk/yordsAadTAOKbjitD5nuDTGNkBQbQL02dTik9xQL+qUowjYTSDnyh1kJYN+YQdjcydHu6/zlB7HKy25d/BtzYHNoK2a79Yix41M1DKsfB+LAT5CT0kJL6XNzTZQya2TywSBwATjX8gS4DOTJjVlDixOy+bJztGHDazsh/wzHkPT+lCEkS3bA2Sgvu7YWaYS8RDgo8q8bDrx1sLYjHGlzGRw+wftOOwgTY1mS4GvaacYJ2mjeruHelz574=
