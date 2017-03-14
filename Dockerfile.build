@@ -7,7 +7,7 @@ ARG vg_git_revision=master
 RUN locale-gen en_US en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
 
 # install apt dependencies
-RUN apt-get -qq install -y \
+RUN apt-get -qq update && apt-get -qq install -y \
     pkg-config \
     sudo \
     curl \
