@@ -9,7 +9,7 @@ set -ex -o pipefail
 # detect the desired git revision of vg from the submodule in this repo
 git -C vg fetch --tags origin
 vg_git_revision=$(git -C vg rev-parse HEAD)
-image_tag_prefix="quay.io/vgteam/vg:$(git -C vg describe --long --always --tags)"
+image_tag_prefix="quay.io/vgteam/vg:$(git -C vg describe --long --always --tags)-t${TRAVIS_BUILD_NUMBER}"
 
 # make a docker image vg:xxxx-build from the fully-built source tree; details in Dockerfile.build
 docker pull ubuntu:16.04
