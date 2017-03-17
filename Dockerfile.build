@@ -12,6 +12,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     sudo \
     curl \
     wget \
+    pigz \
     unzip \
     bsdmainutils \
     build-essential \
