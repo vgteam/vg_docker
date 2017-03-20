@@ -51,7 +51,8 @@ temp_container_id=$(docker create "${image_tag_prefix}-run-preprecursor")
 docker export "$temp_container_id" | docker import - "${image_tag_prefix}-run-precursor"
 echo "FROM ${image_tag_prefix}-run-precursor" '
 ENV PATH /vg/bin:$PATH
-WORKDIR /vg' | docker build -t "${image_tag_prefix}-run" -
+WORKDIR /vg
+CMD /bin/bash' | docker build -t "${image_tag_prefix}-run" -
 # sanity check
 docker run -t "${image_tag_prefix}-run" vg version
 
