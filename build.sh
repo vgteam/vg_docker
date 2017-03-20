@@ -50,7 +50,7 @@ docker build --no-cache -t "${image_tag_prefix}-run-preprecursor" ctx/
 temp_container_id=$(docker create "${image_tag_prefix}-run-preprecursor")
 docker export "$temp_container_id" | docker import - "${image_tag_prefix}-run-precursor"
 echo "FROM ${image_tag_prefix}-run-precursor" '
-ENV PATH /vg/bin:$PATH
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/vg/bin
 WORKDIR /vg
 CMD /bin/bash' | docker build -t "${image_tag_prefix}-run" -
 # sanity check
