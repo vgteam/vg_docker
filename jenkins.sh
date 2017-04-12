@@ -112,19 +112,22 @@ fi
 
 # run the tests, output the junit report for Jenkins
 pytest -vv ./vgci.py --junitxml=test-report.xml
+PYRET="$?"
 
 # we publish the results to the archive
 tar czf "${VG_VERSION}_output.tar.gz" ./vgci-work ./test-report.xml ./vgci.py ./jenkins.sh ./vgci_cfg.tsv
 aws s3 cp "${VG_VERSION}_output.tar.gz" s3://glennhickey-vgci-output/
 
-
 # if success, we publish results to the baseline
-# todo : sync to s3
+if [ "$PYRET" -eq 0 ]
+then
+	 aws s3 sync ./vgci-work/ s3://glennhickey-vg-regression-baseline
+fi
 
 # clean working copy to satisfy corresponding check in Makefile
 rm -rf bin awscli s3am
 
-rm -rf .env
+rm -rf .env vgci-work
 if [ -d "/mnt/ephemeral" ]
 then
 	 rm -rf $TMPDIR
