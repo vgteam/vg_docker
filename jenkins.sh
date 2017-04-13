@@ -21,12 +21,15 @@
 
 #!/bin/bash
 
-usage() { printf "Usage: $0 [Options] \nOptions:\n\t-b <B>\t Build vg branch B locally and do not use Docker\n" 1>&2; exit 1; }
+usage() { printf "Usage: $0 [Options] \nOptions:\n\t-b <B>\t Build vg for branch B locally\n\t-r <R>\t Build docker image for vg revision R locally\n" 1>&2; exit 1; }
 
-while getopts "b:" o; do
+while getopts "b:r:" o; do
     case "${o}" in
         b)
             BRANCH=$OPTARG
+            ;;
+        r)
+            REVISION=$OPTARG
             ;;
         *)
             usage
@@ -84,10 +87,58 @@ printf "workdir ./vgci-work\n" >> vgci_cfg.tsv
 #printf "verify False\n" >> vgci_cfg.tsv
 #printf "baseline ./vgci-baseline\n" >> vgci_cfg.tsv
 
-
-# if no branch specified, we look for a new docker image
-if [ -z ${BRANCH+x} ]
+# Build a local docker image for given revision. 
+if [ -n "${REVISION}" ]
 then
+    git clone https://github.com/vgteam/vg_docker.git ${TMPDIR}/vg_docker
+    docker pull ubuntu:16.04
+    # hack to work on jenkins image
+    grep -v locale ${TMPDIR}/vg_docker/Dockerfile.build > Dockerfile.nl
+    docker build --no-cache --build-arg "vg_git_revision=${REVISION}" -t "jenkins-local-${REVISION}-build" - < Dockerfile.nl
+    if [ "$?" -ne 0 ]
+    then
+	echo "vg local docker build fail"
+	exit 1
+    fi
+
+    printf "vg-docker-version jenkins-local-${REVISION}-build\n" >> vgci_cfg.tsv
+    
+    
+# Build a local vg for given branch.  Note this requires gcc 4.9 which docker-jenkins-image
+# doesn't have.  It's hard to run this from a normal ssh (which only gives sudo apt-get),
+# not much hope until image upgraded.
+elif [ -n "${BRANCH}" ]
+then
+    # Make sure we're running gcc 4.9 by def
+    # https://gist.github.com/ibogun/ec0a4005c25df57a1b9d
+    #sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    #sudo apt-get -qq update
+    #sudo apt-get install -y gcc-4.9 g++-4.9
+    #sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 50
+    #sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 50
+    
+    # (copied from vg docker.  may be slight overkill here.  only do on jenkins instances)
+    sudo apt-get -qq install -y pkg-config sudo curl pv wget pigz unzip bsdmainutils \
+build-essential make automake cmake libtool bison flex git zlib1g-dev libbz2-dev libncurses5-dev \
+libgoogle-perftools-dev libjansson-dev librdf-dev jq bc rs redland-utils raptor2-utils \
+rasqal-utils samtools
+
+    git clone https://github.com/vgteam/vg.git --branch $BRANCH --recursive ${TMPDIR}/vg.local
+    pushd ${TMPDIR}/vg.local
+    . source_me.sh	 
+    make -j ${NUM_CORES} ; make
+    if [ "$?" -ne 0 ]
+    then
+	echo "vg make fail"
+	exit 1
+    fi
+    VG_VERSION=`vg version`
+    popd	 
+    # disable docker (which is on bydefault)
+    printf "vg-docker-version None\n" >> vgci_cfg.tsv
+
+# if no branch specified, we look for a new docker image on quay
+else
 	# We only proceed if we have a new docker image to use
 	QUAY_TAG=`python ./quay_tag_info.py vgteam/vg --max-age $MAX_MINUTES_ELAPSED`
 	if [ "$?" -eq 0 ] && [ "${#QUAY_TAG}" -ge 10 ]
@@ -98,16 +149,6 @@ then
 		 echo "Could not find vg docker image younger than ${MAX_MINUTES_ELAPSED} minutes"
 		 exit 1
 	fi
-# otherwise, we build a local vg for the given branch
-else
-	 git clone https://github.com/vgteam/vg.git --branch $BRANCH --recursive ./vg.local
-	 pushd ./vg.local
-	 . source_me.sh	 
-	 make -j ${NUM_CORES} ; make
-	 VG_VERSION=`vg version`
-	 # disable docker (which is on bydefault)
-	 printf "vg-docker-version None\n" >> vgci_cfg.tsv
-	 popd	 
 fi
 
 # run the tests, output the junit report for Jenkins
@@ -121,8 +162,9 @@ aws s3 cp "${VG_VERSION}_output.tar.gz" s3://glennhickey-vgci-output/
 # if success, we publish results to the baseline
 if [ "$PYRET" -eq 0 ]
 then
-	 aws s3 sync ./vgci-work/ s3://glennhickey-vg-regression-baseline
+    aws s3 sync ./vgci-work/ s3://glennhickey-vg-regression-baseline
 fi
+
 
 # clean working copy to satisfy corresponding check in Makefile
 rm -rf bin awscli s3am
