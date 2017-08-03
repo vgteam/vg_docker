@@ -27,6 +27,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     libgoogle-perftools-dev \
     libjansson-dev \
     librdf-dev \
+    liblzma-dev \
     jq \
     bc \
     rs \
