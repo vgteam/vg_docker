@@ -24,6 +24,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     liblzma-dev \
     zlib1g-dev \
     libbz2-dev \
+    liblzma-dev \
     liblz4-dev \
     libncurses5-dev \
     libgoogle-perftools-dev \
@@ -43,6 +44,11 @@ RUN dpkg -i /tmp/bwa.deb
 RUN git clone https://github.com/vgteam/vg.git /vg
 WORKDIR /vg
 RUN git fetch --tags origin && git checkout "$vg_git_revision" && git submodule update --init --recursive
+
+# To increase portability of the docker image, patch the compiler flags to set
+# the target CPU architecture to Ivy Bridge (2012) rather than auto-detecting
+# the build machine's CPU.
+RUN sed -i s/march=native/march=ivybridge/ Makefile && sed -i s/mtune=native/mtune=ivybridge/ Makefile
 
 # Build
 RUN . ./source_me.sh && make -j$(nproc) && make static
