@@ -51,6 +51,6 @@ RUN git fetch --tags origin && git checkout "$vg_git_revision" && git submodule 
 RUN sed -i s/march=native/march=ivybridge/ Makefile && sed -i s/mtune=native/mtune=ivybridge/ Makefile
 
 # Build
-RUN . ./source_me.sh && make -j$(nproc)
+RUN . ./source_me.sh && make -j$(nproc) && make static
 
 ENV PATH /vg/bin:$PATH
