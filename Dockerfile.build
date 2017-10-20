@@ -20,6 +20,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     libtool \
     bison \
     flex \
+    gdb \
     git \
     liblzma-dev \
     zlib1g-dev \
@@ -36,7 +37,8 @@ RUN apt-get -qq update && apt-get -qq install -y \
     redland-utils \
     raptor2-utils \
     rasqal-utils \
-    samtools
+    samtools \
+    time
 ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-2_amd64.deb /tmp/bwa.deb
 RUN dpkg -i /tmp/bwa.deb
 
