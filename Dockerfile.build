@@ -49,6 +49,7 @@ RUN git fetch --tags origin && git checkout "$vg_git_revision" && git submodule 
 
 # To increase portability of the docker image, set the target CPU architecture to
 # Ivy Bridge (2012) rather than auto-detecting the build machine's CPU.
-RUN . ./source_me.sh && CXXFLAGS=" -march=ivybridge -mtune=ivybridge " make -j$(nproc) && make static
+RUN sed -i s/march=native/march=ivybridge/ deps/sdsl-lite/CMakeLists.txt
+RUN . ./source_me.sh && CXXFLAGS=" -march=ivybridge " make -j$(nproc) && make static
 
 ENV PATH /vg/bin:$PATH
