@@ -27,6 +27,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     libbz2-dev \
     liblzma-dev \
     liblz4-dev \
+    libsnappy-dev \
     libncurses5-dev \
     libgoogle-perftools-dev \
     libjansson-dev \
