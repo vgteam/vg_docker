@@ -48,7 +48,7 @@ docker cp "${temp_container_id}:/vg/scripts/" ctx/vg/scripts/
 echo "FROM ubuntu:16.04
 MAINTAINER vgteam
 RUN apt-get -qq update && apt-get -qq install -y curl wget pigz dstat pv jq samtools tabix parallel
-ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-2_amd64.deb /tmp/bwa.deb
+ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
 RUN dpkg -i /tmp/bwa.deb && rm /tmp/bwa.deb
 RUN apt-get clean
 COPY vg/ /vg/
