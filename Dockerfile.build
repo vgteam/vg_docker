@@ -39,7 +39,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     rasqal-utils \
     samtools \
     time
-ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-2_amd64.deb /tmp/bwa.deb
+ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
 RUN dpkg -i /tmp/bwa.deb
 
 # fetch the desired git revision of vg
