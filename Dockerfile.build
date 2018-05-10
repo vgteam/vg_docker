@@ -3,41 +3,19 @@ FROM ubuntu:16.04
 MAINTAINER vgteam
 ARG vg_git_revision=master
 
-# install apt dependencies
+# install basic apt dependencies
+# note: most vg apt dependencies are installed by "make get-deps" below
 RUN apt-get -qq update && apt-get -qq install -y \
-    pkg-config \
     sudo \
-    curl \
     pv \
-    wget \
     pigz \
-    unzip \
     bsdmainutils \
     build-essential \
     make \
-    automake \
-    cmake \
-    libtool \
-    bison \
-    flex \
-    gdb \
     git \
-    liblzma-dev \
     zlib1g-dev \
-    libbz2-dev \
-    liblzma-dev \
-    liblz4-dev \
-    libncurses5-dev \
-    libgoogle-perftools-dev \
-    libjansson-dev \
-    librdf-dev \
-    jq \
-    bc \
     rs \
-    redland-utils \
-    raptor2-utils \
-    rasqal-utils \
-    samtools \
+    gdb \
     time \
     gawk
 ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
@@ -51,6 +29,6 @@ RUN git fetch --tags origin && git checkout "$vg_git_revision" && git submodule 
 # To increase portability of the docker image, set the target CPU architecture to
 # Ivy Bridge (2012) rather than auto-detecting the build machine's CPU.
 RUN sed -i s/march=native/march=ivybridge/ deps/sdsl-lite/CMakeLists.txt
-RUN . ./source_me.sh && CXXFLAGS=" -march=ivybridge " make -j$(nproc) && make static
+RUN . ./source_me.sh && make get-deps && CXXFLAGS=" -march=ivybridge " make -j$(nproc) && make static
 
 ENV PATH /vg/bin:$PATH
