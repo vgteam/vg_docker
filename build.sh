@@ -9,7 +9,17 @@ set -ex -o pipefail
 # detect the desired git revision of vg from the submodule in this repo
 git -C vg fetch --tags origin
 vg_git_revision=$(git -C vg rev-parse HEAD)
-image_tag_prefix="quay.io/vgteam/vg:$(git -C vg describe --long --always --tags)-t${TRAVIS_BUILD_NUMBER}"
+
+if [[ "${TRAVIS_BRANCH}" == "master" && -z "${TRAVIS_PULL_REQUEST_BRANCH}" ]]; then
+    # This is a push build of the master branch
+     dev_tag=""
+else
+    # This is a custom build
+    # TODO: push to a different Quay repo
+    dev_tag="dev-"
+fi
+
+image_tag_prefix="quay.io/vgteam/vg:${dev_tag}$(git -C vg describe --long --always --tags)-t${TRAVIS_BUILD_NUMBER}"
 
 # make a docker image vg:xxxx-build from the fully-built source tree; details in Dockerfile.build
 docker pull ubuntu:16.04
