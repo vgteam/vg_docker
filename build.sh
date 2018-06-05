@@ -6,9 +6,10 @@ docker login -u="vgteam+travis" -p="$QUAY_PASSWORD" quay.io
 
 set -ex -o pipefail
 
-# detect the desired git revision of vg from the submodule in this repo
+# detect the desired git revision and URL for vg from the submodule in this repo
 git -C vg fetch --tags origin
 vg_git_revision=$(git -C vg rev-parse HEAD)
+vg_git_url=$(git -C vg remote get-url origin)
 
 if [[ "${TRAVIS_BRANCH}" == "master" && -z "${TRAVIS_PULL_REQUEST_BRANCH}" ]]; then
     # This is a push build of the master branch
@@ -23,7 +24,7 @@ image_tag_prefix="quay.io/vgteam/vg:${dev_tag}$(git -C vg describe --long --alwa
 
 # make a docker image vg:xxxx-build from the fully-built source tree; details in Dockerfile.build
 docker pull ubuntu:16.04
-docker build --no-cache --build-arg "vg_git_revision=${vg_git_revision}" -t "${image_tag_prefix}-build" - < Dockerfile.build
+docker build --no-cache --build-arg "vg_git_revision=${vg_git_revision}" --build-arg "vg_git_url=${vg_git_url}" -t "${image_tag_prefix}-build" - < Dockerfile.build
 docker run -t "${image_tag_prefix}-build" vg version # sanity check
 
 # check that the compiled executable does not have AVX2 instructions, to ensure it
