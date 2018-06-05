@@ -2,6 +2,7 @@
 FROM ubuntu:16.04
 MAINTAINER vgteam
 ARG vg_git_revision=master
+ARG vg_git_url=https://github.com/vgteam/vg.git
 
 # install basic apt dependencies
 # note: most vg apt dependencies are installed by "make get-deps" below
@@ -23,7 +24,7 @@ ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-5_amd64.deb 
 RUN dpkg -i /tmp/bwa.deb
 
 # fetch the desired git revision of vg
-RUN git clone https://github.com/vgteam/vg.git /vg
+RUN git clone "$vg_git_url" /vg
 WORKDIR /vg
 RUN git fetch --tags origin && git checkout "$vg_git_revision" && git submodule update --init --recursive
 
