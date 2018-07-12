@@ -24,7 +24,12 @@ image_tag_prefix="quay.io/vgteam/vg:${dev_tag}$(git -C vg describe --long --alwa
 
 # make a docker image vg:xxxx-build from the fully-built source tree; details in Dockerfile.build
 docker pull ubuntu:16.04
-docker build --no-cache --build-arg "vg_git_revision=${vg_git_revision}" --build-arg "vg_git_url=${vg_git_url}" -t "${image_tag_prefix}-build" - < Dockerfile.build
+mkdir ctx/
+cp Dockerfile.build ctx/Dockerfile
+cp -R deps ctx/
+ls -lR ctx 
+docker build --no-cache --build-arg "vg_git_revision=${vg_git_revision}" --build-arg "vg_git_url=${vg_git_url}" -t "${image_tag_prefix}-build" ctx/
+rm -Rf ctx/
 docker run -t "${image_tag_prefix}-build" vg version # sanity check
 
 # check that the compiled executable does not have AVX2 instructions, to ensure it
@@ -68,6 +73,7 @@ COPY vg/ /vg/
 ls -lR ctx
 # - build image from this synthesized context
 docker build --no-cache -t "${image_tag_prefix}-run-preprecursor" ctx/
+rm -Rf ctx/
 # - flatten the image, to further reduce its deploy size, and set up the runtime ENV/WORKDIR etc.
 temp_container_id=$(docker create "${image_tag_prefix}-run-preprecursor")
 docker export "$temp_container_id" | docker import - "${image_tag_prefix}-run-precursor"
