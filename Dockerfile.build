@@ -20,7 +20,7 @@ RUN apt-get -qq update && apt-get -qq install -y \
     gdb \
     time \
     gawk
-ADD http://mirrors.kernel.org/ubuntu/pool/universe/b/bwa/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
+ADD deps/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
 RUN dpkg -i /tmp/bwa.deb
 
 # fetch the desired git revision of vg
