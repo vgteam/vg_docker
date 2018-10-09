@@ -64,7 +64,7 @@ cp -R deps/ ctx/deps
 # - synthesize a Dockerfile for a new image with that stuff along with the minimal apt dependencies
 echo "FROM ubuntu:16.04
 MAINTAINER vgteam
-RUN apt-get -qq update && apt-get -qq install -y curl wget pigz dstat pv jq samtools tabix parallel
+RUN apt-get -qq update && apt-get -qq install -y curl wget pigz dstat pv jq samtools tabix parallel fontconfig-config
 ADD deps/bwa_0.7.15-5_amd64.deb /tmp/bwa.deb
 RUN dpkg -i /tmp/bwa.deb && rm /tmp/bwa.deb
 RUN apt-get clean
