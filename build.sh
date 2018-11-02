@@ -9,6 +9,8 @@ set -ex -o pipefail
 # detect the desired git revision and URL for vg from the submodule in this repo
 git -C vg fetch --tags origin
 vg_git_revision=$(git -C vg rev-parse HEAD)
+# This will be "" unless we are building a tag, in which case it will be the tag
+vg_release_tag=$(git -C vg describe --exact-match --tags HEAD 2>/dev/null || true)
 vg_git_url=$(git -C vg remote get-url origin)
 
 if [[ "${TRAVIS_BRANCH}" == "master" && -z "${TRAVIS_PULL_REQUEST_BRANCH}" ]]; then
@@ -20,7 +22,13 @@ else
     dev_tag="dev-"
 fi
 
-image_tag_prefix="quay.io/vgteam/vg:${dev_tag}$(git -C vg describe --long --always --tags)-t${TRAVIS_BUILD_NUMBER}"
+image_repo="quay.io/vgteam/vg"
+image_tag_prefix="${image_repo}:${dev_tag}$(git -C vg describe --long --always --tags)-t${TRAVIS_BUILD_NUMBER}"
+if [[ ! -z "${vg_release_tag}" ]] ; then
+    image_release_with_tag="${image_repo}:${dev_tag}${vg_release_tag}"
+else
+    image_release_with_tag=""
+fi
 
 # make a docker image vg:xxxx-build from the fully-built source tree; details in Dockerfile.build
 docker pull ubuntu:16.04
@@ -87,3 +95,9 @@ docker run -t "${image_tag_prefix}-run" vg version
 # push images
 docker push "${image_tag_prefix}-build"
 docker push "${image_tag_prefix}-run"
+
+if [[ ! -z "${image_release_with_tag}" ]] ; then
+    # We just built a release. Tag it as such
+    docker tag "${image_tag_prefix}-run" "${image_release_with_tag}"
+    docker push "${image_release_with_tag}"
+fi
