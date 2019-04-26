@@ -96,7 +96,7 @@ docker run -t "${image_tag_prefix}-run" vg version
 docker push "${image_tag_prefix}-build"
 docker push "${image_tag_prefix}-run"
 
-if [[ ! -z "${image_release_with_tag}" ]] ; then
+if [ -n "${image_release_with_tag}" ] && [ -z "${dev_tag}" ] ; then
     # We just built a release. Tag it as such
     docker tag "${image_tag_prefix}-run" "${image_release_with_tag}"
     docker push "${image_release_with_tag}"
@@ -104,6 +104,8 @@ if [[ ! -z "${image_release_with_tag}" ]] ; then
     # mirror release images to Docker Hub too
     set +x
     docker login -u="vgdockerci" -p="$VGDOCKERCI_PASSWORD"
-    docker tag "${image_tag_prefix}-run" "variantgraphs/vg:${dev_tag}${vg_release_tag}"
-    docker push "variantgraphs/vg:${dev_tag}${vg_release_tag}"
+    docker tag "${image_tag_prefix}-run" "variantgraphs/vg:${vg_release_tag}"
+    docker push "variantgraphs/vg:${vg_release_tag}"
+    docker tag "${image_tag_prefix}-run" "variantgraphs/vg"
+    docker push "variantgraphs/vg"
 fi
