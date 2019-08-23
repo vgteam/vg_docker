@@ -90,7 +90,7 @@ docker push "${image_tag_prefix}-run"
 exit_code=0
 docker run -t "${image_tag_prefix}-build" make test || exit_code=$?
 if (( exit_code == 0 )); then
-    # tests failed...re-tag and push image for debugging
+    # tests succeeded...re-tag and push image for debugging
     docker tag "${image_tag_prefix}-build" "${image_tag_prefix}-TESTSUCCESS"
     docker push "${image_tag_prefix}-TESTSUCCESS"
     exit $exit_code
