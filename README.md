@@ -64,3 +64,5 @@ When you push an update to this repository,
 1. pushes the images to Quay.
 
 Compared to the simpler automatic build features of Quay and Docker Hub, this provides us more control over how the images are prepared, tested, and tagged.
+
+Release images are also mirrored to Docker Hub [variantgraphs/vg](https://cloud.docker.com/u/variantgraphs/repository/docker/variantgraphs/vg), using the dedicated `vgdockerci` Docker Hub account with the password also in a Travis secure environment variable.
